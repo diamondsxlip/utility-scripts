@@ -132,12 +132,12 @@ function countFiles(dir) {
 // 生成新文件夹名
 function generateNewName(originalName, result) {
     var sizeStr;
-    var sizeMB = result.totalSize / (1000 * 1000); // 转换为MB
+    var sizeMB = result.totalSize / (1024 * 1024); // 转换为MB
     
-    if (sizeMB < 1000) {
+    if (sizeMB < 1024) {
         sizeStr = Math.round(sizeMB) + 'MB';
     } else {
-        var sizeGB = sizeMB / 1000;
+        var sizeGB = sizeMB / 1024;
         sizeStr = sizeGB.toFixed(2) + 'GB';
     }
     

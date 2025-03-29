@@ -5,7 +5,7 @@ cd %~dp0
 call CScript.EXE "%~dpnx0" //Nologo //e:jscript %*
 goto cmd
 -------------------------------------------------------
-Build       1743209912930
+Build       1743212074514
 Compiler    node2bat.js@0.0.4-rc2 | https://github.com/aui/node2bat
 -------------------------------------------------------
 */(function () {
@@ -145,12 +145,12 @@ function countFiles(dir) {
 // \u751f\u6210\u65b0\u6587\u4ef6\u5939\u540d
 function generateNewName(originalName, result) {
     var sizeStr;
-    var sizeMB = result.totalSize / (1000 * 1000); // \u8f6c\u6362\u4e3aMB
+    var sizeMB = result.totalSize / (1024 * 1024); // \u8f6c\u6362\u4e3aMB
     
-    if (sizeMB < 1000) {
+    if (sizeMB < 1024) {
         sizeStr = Math.round(sizeMB) + 'MB';
     } else {
-        var sizeGB = sizeMB / 1000;
+        var sizeGB = sizeMB / 1024;
         sizeStr = sizeGB.toFixed(2) + 'GB';
     }
     
