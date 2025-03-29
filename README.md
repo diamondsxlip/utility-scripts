@@ -16,8 +16,8 @@
    - `xMB` 或 `x.xxGB`：文件夹大小
 
 ### 使用方法
-1. 将 `test.bat` 和 `rename.bat` 放入目标文件夹。
-2. 双击运行 `rename.bat`。
+1. 将 `folder_renamer.bat`  放入目标文件夹。
+2. 双击运行 `folder_renamer.bat`。
 3. 脚本会自动处理所有子文件夹。
 
 ### 注意事项
