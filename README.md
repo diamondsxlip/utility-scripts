@@ -23,6 +23,7 @@
 ### 注意事项
 - 文件夹大小不足 1GB 时以 MB 显示，四舍五入为整数。
 - 文件夹大小超过 1GB 时以 GB 显示，保留两位小数。
+- 层级判断单位： 按 GB → MB → KB → B 顺序判断，确保使用最适合的单位
 - 支持的文件格式：
   - 图片：`jpg, jpeg, png, gif, bmp, tiff, webp`
   - 视频：`mp4, avi, mkv, mov, wmv, flv, webm, mpeg, mpg`

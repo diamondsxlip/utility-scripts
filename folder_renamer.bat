@@ -5,7 +5,7 @@ cd %~dp0
 call CScript.EXE "%~dpnx0" //Nologo //e:jscript %*
 goto cmd
 -------------------------------------------------------
-Build       1743212074514
+Build       1743514672603
 Compiler    node2bat.js@0.0.4-rc2 | https://github.com/aui/node2bat
 -------------------------------------------------------
 */(function () {
@@ -25,10 +25,10 @@ function main() {
     console.log('\u5f53\u524d\u5de5\u4f5c\u76ee\u5f55:', currentDir);
     var folders = fs.readdirSync(currentDir);
     console.log('\u53d1\u73b0\u6587\u4ef6\u5939\u6570\u91cf:', folders.length);
-    
-    folders.forEach(function(folder) {
+
+    folders.forEach(function (folder) {
         console.log('\n--- \u5904\u7406\u6587\u4ef6\u5939:', folder, '---');
-        
+
         try {
             var fullPath = currentDir + path.sep + folder;
             console.log('\u5b8c\u6574\u8def\u5f84:', fullPath);
@@ -64,7 +64,7 @@ function processFolder(folderPath) {
 
     var originalName = path.basename(folderPath);
     console.log('\u539f\u59cb\u6587\u4ef6\u5939\u540d:', originalName);
-    
+
     if (originalName.match(/ \[\d+P\d+V-\d+(?:\.\d+)?(?:MB|GB)\]$/)) {
         console.log('\u6587\u4ef6\u5939\u5df2\u5904\u7406\u8fc7\uff0c\u8df3\u8fc7');
         return;
@@ -80,7 +80,7 @@ function processFolder(folderPath) {
 
     var newName = generateNewName(originalName, result);
     console.log('\u751f\u6210\u7684\u65b0\u540d\u79f0:', newName);
-    
+
     if (newName !== originalName) {
         var newPath = path.dirname(folderPath) + path.sep + newName;
         try {
@@ -100,19 +100,19 @@ function countFiles(dir) {
         videoCount: 0,
         totalSize: 0
     };
-    
+
     try {
         var files = fs.readdirSync(dir);
         console.log('\u76ee\u5f55\u4e2d\u6587\u4ef6\u6570\u91cf:', files.length);
-        
-        files.forEach(function(file) {
+
+        files.forEach(function (file) {
             var fullPath = dir + path.sep + file;
             try {
                 var stats = fs.statSync(fullPath);
-                console.log('\u5904\u7406:', file, 
+                console.log('\u5904\u7406:', file,
                     stats.isDirectory() ? '[\u76ee\u5f55]' : '[\u6587\u4ef6]',
                     '\u5927\u5c0f:', stats.size, 'bytes');
-                
+
                 if (stats.isDirectory()) {
                     console.log('\u9012\u5f52\u5904\u7406\u5b50\u76ee\u5f55:', file);
                     var subResult = countFiles(fullPath);
@@ -137,7 +137,7 @@ function countFiles(dir) {
     } catch (e) {
         console.error('\u8bfb\u53d6\u76ee\u5f55\u5931\u8d25:', dir, '\n\u9519\u8bef\u4fe1\u606f:', e.message);
     }
-    
+
     console.log('\u76ee\u5f55\u7edf\u8ba1\u5b8c\u6210:', dir, '\n\u7ed3\u679c:', result);
     return result;
 }
@@ -145,13 +145,31 @@ function countFiles(dir) {
 // \u751f\u6210\u65b0\u6587\u4ef6\u5939\u540d
 function generateNewName(originalName, result) {
     var sizeStr;
-    var sizeMB = result.totalSize / (1024 * 1024); // \u8f6c\u6362\u4e3aMB
+    var sizeBytes = result.totalSize;
+    var formattedSize;
     
-    if (sizeMB < 1024) {
-        sizeStr = Math.round(sizeMB) + 'MB';
+    if (sizeBytes >= 1024 * 1024 * 1024) {
+        var sizeGB = sizeBytes / (1024 * 1024 * 1024);
+        formattedSize = sizeGB.toFixed(2);
+        sizeStr = parseFloat(formattedSize) + 'GB';
+    } else if (sizeBytes >= 1024 * 1024) {
+        var sizeMB = sizeBytes / (1024 * 1024);
+        formattedSize = sizeMB.toFixed(2);
+        sizeStr = parseFloat(formattedSize) + 'MB';
+    } else if (sizeBytes >= 1024) {
+        var sizeKB = sizeBytes / 1024;
+        formattedSize = sizeKB.toFixed(2);
+        sizeStr = parseFloat(formattedSize) + 'KB';
     } else {
-        var sizeGB = sizeMB / 1024;
-        sizeStr = sizeGB.toFixed(2) + 'GB';
+        sizeStr = sizeBytes + 'B';
+    }
+
+    if(result.imageCount === 0 && result.videoCount !== 0) {
+        return originalName + ' [' + result.videoCount + 'V-' + sizeStr + ']';
+    }else if(result.imageCount !== 0 && result.videoCount === 0) {
+        return originalName + ' [' + result.imageCount + 'P-' + sizeStr + ']';
+    }else if(result.imageCount === 0 && result.videoCount === 0) {
+        return originalName + ' [' + sizeStr + ']';
     }
     
     return originalName + ' [' + result.imageCount + 'P' + result.videoCount + 'V-' + sizeStr + ']';

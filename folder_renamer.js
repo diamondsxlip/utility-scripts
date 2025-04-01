@@ -12,10 +12,10 @@ function main() {
     console.log('当前工作目录:', currentDir);
     var folders = fs.readdirSync(currentDir);
     console.log('发现文件夹数量:', folders.length);
-    
-    folders.forEach(function(folder) {
+
+    folders.forEach(function (folder) {
         console.log('\n--- 处理文件夹:', folder, '---');
-        
+
         try {
             var fullPath = currentDir + path.sep + folder;
             console.log('完整路径:', fullPath);
@@ -51,7 +51,7 @@ function processFolder(folderPath) {
 
     var originalName = path.basename(folderPath);
     console.log('原始文件夹名:', originalName);
-    
+
     if (originalName.match(/ \[\d+P\d+V-\d+(?:\.\d+)?(?:MB|GB)\]$/)) {
         console.log('文件夹已处理过，跳过');
         return;
@@ -67,7 +67,7 @@ function processFolder(folderPath) {
 
     var newName = generateNewName(originalName, result);
     console.log('生成的新名称:', newName);
-    
+
     if (newName !== originalName) {
         var newPath = path.dirname(folderPath) + path.sep + newName;
         try {
@@ -87,19 +87,19 @@ function countFiles(dir) {
         videoCount: 0,
         totalSize: 0
     };
-    
+
     try {
         var files = fs.readdirSync(dir);
         console.log('目录中文件数量:', files.length);
-        
-        files.forEach(function(file) {
+
+        files.forEach(function (file) {
             var fullPath = dir + path.sep + file;
             try {
                 var stats = fs.statSync(fullPath);
-                console.log('处理:', file, 
+                console.log('处理:', file,
                     stats.isDirectory() ? '[目录]' : '[文件]',
                     '大小:', stats.size, 'bytes');
-                
+
                 if (stats.isDirectory()) {
                     console.log('递归处理子目录:', file);
                     var subResult = countFiles(fullPath);
@@ -124,7 +124,7 @@ function countFiles(dir) {
     } catch (e) {
         console.error('读取目录失败:', dir, '\n错误信息:', e.message);
     }
-    
+
     console.log('目录统计完成:', dir, '\n结果:', result);
     return result;
 }
@@ -132,13 +132,31 @@ function countFiles(dir) {
 // 生成新文件夹名
 function generateNewName(originalName, result) {
     var sizeStr;
-    var sizeMB = result.totalSize / (1024 * 1024); // 转换为MB
+    var sizeBytes = result.totalSize;
+    var formattedSize;
     
-    if (sizeMB < 1024) {
-        sizeStr = Math.round(sizeMB) + 'MB';
+    if (sizeBytes >= 1024 * 1024 * 1024) {
+        var sizeGB = sizeBytes / (1024 * 1024 * 1024);
+        formattedSize = sizeGB.toFixed(2);
+        sizeStr = parseFloat(formattedSize) + 'GB';
+    } else if (sizeBytes >= 1024 * 1024) {
+        var sizeMB = sizeBytes / (1024 * 1024);
+        formattedSize = sizeMB.toFixed(2);
+        sizeStr = parseFloat(formattedSize) + 'MB';
+    } else if (sizeBytes >= 1024) {
+        var sizeKB = sizeBytes / 1024;
+        formattedSize = sizeKB.toFixed(2);
+        sizeStr = parseFloat(formattedSize) + 'KB';
     } else {
-        var sizeGB = sizeMB / 1024;
-        sizeStr = sizeGB.toFixed(2) + 'GB';
+        sizeStr = sizeBytes + 'B';
+    }
+
+    if(result.imageCount === 0 && result.videoCount !== 0) {
+        return originalName + ' [' + result.videoCount + 'V-' + sizeStr + ']';
+    }else if(result.imageCount !== 0 && result.videoCount === 0) {
+        return originalName + ' [' + result.imageCount + 'P-' + sizeStr + ']';
+    }else if(result.imageCount === 0 && result.videoCount === 0) {
+        return originalName + ' [' + sizeStr + ']';
     }
     
     return originalName + ' [' + result.imageCount + 'P' + result.videoCount + 'V-' + sizeStr + ']';
