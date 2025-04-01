@@ -145,8 +145,8 @@ function generateNewName(originalName, result) {
         sizeStr = parseFloat(formattedSize) + 'MB';
     } else if (sizeBytes >= 1024) {
         var sizeKB = sizeBytes / 1024;
-        formattedSize = sizeKB.toFixed(2);
-        sizeStr = parseFloat(formattedSize) + 'KB';
+        formattedSize = sizeKB.toFixed(0);
+        sizeStr = formattedSize + 'KB';
     } else {
         sizeStr = sizeBytes + 'B';
     }
